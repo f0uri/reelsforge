@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ريلز فورج 🎬 — ألصق الرابط فقط</title>
+<style>
+  :root{
+    --bg:#0b0d17; --card:#131729; --card2:#1a1f38; --line:#262d4d;
+    --txt:#eef1ff; --mut:#9aa3c7; --acc:#ff4d6d; --acc2:#ff9e3d;
+    --grad:linear-gradient(135deg,#ff4d6d,#ff9e3d);
+    --ok:#2dd4a7; --gold:#ffc83d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg);
+    color:var(--txt); min-height:100vh; overflow-x:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-1;
+    background:
+      radial-gradient(600px 400px at 85% -5%, rgba(255,77,109,.16), transparent),
+      radial-gradient(700px 500px at 10% 20%, rgba(99,102,241,.12), transparent),
+      radial-gradient(500px 400px at 60% 110%, rgba(255,158,61,.10), transparent);
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:28px 18px 80px}
+  header{text-align:center; padding:26px 0 10px}
+  .logo{font-size:44px; font-weight:900; letter-spacing:-1px}
+  .logo span{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .tag{color:var(--mut); margin-top:8px; font-size:17px}
+  .badge-row{display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap}
+  .b{font-size:12px; color:var(--mut); border:1px solid var(--line); border-radius:99px; padding:5px 12px; background:rgba(255,255,255,.02)}
+
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:24px; margin-top:22px; box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  label{display:block; font-size:15px; color:var(--mut); margin:6px 0 10px}
+  .url-row{display:flex; gap:10px; margin-top:6px}
+  input[type=text]{
+    flex:1; background:#0d1122; border:1.5px solid var(--line); color:var(--txt);
+    border-radius:14px; padding:16px; font-size:17px; outline:none; direction:ltr; text-align:left;
+  }
+  input[type=text]:focus{border-color:var(--acc)}
+  .btn-main{
+    background:var(--grad); color:#fff; border:none; border-radius:14px;
+    padding:15px 26px; font-size:17px; font-weight:800; cursor:pointer;
+    transition:transform .15s, box-shadow .15s; white-space:nowrap;
+  }
+  .btn-main:hover{transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,77,109,.35)}
+  .btn-main:disabled{opacity:.5; cursor:not-allowed; transform:none}
+  .hint{font-size:13px; color:var(--mut); margin-top:12px; line-height:1.8}
+  .hint b{color:var(--ok)}
+
+  /* التقدم */
+  #progress-box{display:none}
+  .src-info{display:flex; gap:14px; align-items:center; margin-bottom:18px}
+  .src-info img{width:110px; border-radius:10px; border:1px solid var(--line)}
+  .src-title{font-weight:700; font-size:15px; line-height:1.5}
+  .src-meta{color:var(--mut); font-size:13px; margin-top:6px}
+  .steps{display:flex; gap:6px; margin:18px 0 12px; flex-wrap:wrap}
+  .step{flex:1; min-width:90px; text-align:center; font-size:12px; color:var(--mut);
+    border:1px solid var(--line); border-radius:10px; padding:8px 4px; background:#0d1122; transition:all .3s}
+  .step.active{border-color:var(--acc); color:#fff; background:rgba(255,77,109,.12)}
+  .step.done{border-color:var(--ok); color:var(--ok)}
+  .bar{height:14px; background:#0d1122; border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+  .bar>div{height:100%; width:0%; background:var(--grad); border-radius:99px; transition:width .5s}
+  .pct-row{display:flex; justify-content:space-between; margin-top:8px; font-size:13.5px}
+  .pct-row .msg{color:var(--mut)} .pct-row .pct{font-weight:800; color:var(--acc2)}
+  .spinner{display:inline-block; width:14px; height:14px; border:2.5px solid rgba(255,255,255,.25);
+    border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:-2px; margin-left:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* النتائج */
+  #results{display:none}
+  .res-head{display:flex; align-items:center; justify-content:space-between; margin:34px 0 16px; flex-wrap:wrap; gap:10px}
+  .res-head h2{font-size:26px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:22px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:20px; overflow:hidden;
+    box-shadow:0 14px 40px rgba(0,0,0,.35); display:flex; flex-direction:column}
+  .vid-wrap{position:relative; background:#000}
+  video{width:100%; aspect-ratio:9/16; max-height:560px; display:block; background:#000; object-fit:contain}
+  .score{
+    position:absolute; top:12px; right:12px; background:rgba(0,0,0,.65); backdrop-filter:blur(6px);
+    border:1px solid rgba(255,200,61,.5); color:var(--gold); font-weight:800;
+    padding:7px 12px; border-radius:99px; font-size:14px;
+  }
+  .dur-badge{position:absolute; top:12px; left:12px; background:rgba(0,0,0,.65); color:#fff;
+    padding:6px 10px; border-radius:99px; font-size:12.5px}
+  .card-body{padding:18px; display:flex; flex-direction:column; gap:10px; flex:1}
+  .reason{font-size:13px; color:var(--ok)}
+  .title{font-size:17px; font-weight:800; line-height:1.5}
+  .alts{font-size:13px; color:var(--mut); line-height:1.7}
+  .tags{display:flex; flex-wrap:wrap; gap:6px}
+  .tag-chip{background:rgba(99,102,241,.14); border:1px solid rgba(99,102,241,.4);
+    color:#b9c1ff; font-size:12.5px; padding:4px 10px; border-radius:99px; cursor:pointer; transition:.15s}
+  .tag-chip:hover{background:rgba(99,102,241,.3)}
+  .card-actions{display:flex; gap:8px; margin-top:auto}
+  .btn{flex:1; border-radius:12px; padding:12px 8px; font-size:14px; font-weight:700; cursor:pointer; border:none; text-align:center; text-decoration:none; display:inline-block; transition:.15s}
+  .btn-copy{background:#0d1122; border:1.5px solid var(--line); color:var(--txt)}
+  .btn-copy:hover{border-color:var(--acc)}
+  .btn-dl{background:var(--grad); color:#fff}
+  .btn-dl:hover{filter:brightness(1.1)}
+
+  .err{display:none; background:rgba(255,77,109,.1); border:1px solid rgba(255,77,109,.5);
+    color:#ffb3c1; border-radius:14px; padding:16px; margin-top:18px; line-height:1.7}
+
+  #toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:#1c2340; border:1px solid var(--line); color:#fff; padding:12px 22px;
+    border-radius:99px; font-size:14px; opacity:0; transition:.3s; z-index:99; box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  footer{text-align:center; color:var(--mut); font-size:13px; margin-top:50px; line-height:2}
+  footer b{color:#cfd6f5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🎬 ريلز <span>فورج</span></div>
+    <p class="tag">ألصق رابط يوتيوب فقط… والباكي كله تلقائي: قصّ، تحويل 9:16، ترجمة، وهاشتاغات 🚀</p>
+    <div class="badge-row">
+      <span class="b">⚡ يشتغل تلقائياً بمجرد لصق الرابط</span>
+      <span class="b">🧠 كشف اللحظات الفيروسية</span>
+      <span class="b">💬 ترجمة متحركة مدمجة</span>
+      <span class="b">🏷️ هاشتاجات ذكية</span>
+      <span class="b">🔒 محلي 100% بدون مفاتيح</span>
+    </div>
+  </header>
+
+  <div class="panel">
+    <label>🔗 ألصق رابط الفيديو هنا — يبدأ التحويل لوحده، ما عليك تضغط على أي شيء</label>
+    <div class="url-row">
+      <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=..." dir="ltr" autocomplete="off" spellcheck="false">
+      <button class="btn-main" id="go">🚀 حوّل</button>
+    </div>
+    <p class="hint"><b>✅ وضع بدون تدخل:</b> لصق الرابط = انطلاق فوري. لصقت رابطاً ثانياً أثناء المعالجة؟ ينتظر دوره ويشتغل تلقائياً. بعد الانتهاء يُفرَّغ الحقل تلقائياً للرابط التالي.</p>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="panel" id="progress-box">
+    <div class="src-info" id="src-info" style="display:none">
+      <img id="src-thumb" alt="">
+      <div>
+        <div class="src-title" id="src-title"></div>
+        <div class="src-meta" id="src-meta"></div>
+      </div>
+    </div>
+    <div class="steps" id="steps">
+      <div class="step" data-s="download">⬇️ التحميل</div>
+      <div class="step" data-s="audio">🎧 الصوت</div>
+      <div class="step" data-s="transcribe">🎤 التفريغ</div>
+      <div class="step" data-s="analyze">🧠 التحليل</div>
+      <div class="step" data-s="render">✂️ المونتاج</div>
+      <div class="step" data-s="done">✅ جاهز</div>
+    </div>
+    <div class="bar"><div id="bar"></div></div>
+    <div class="pct-row">
+      <span class="msg"><span id="msg">بدء المعالجة…</span><span class="spinner" id="spin"></span></span>
+      <span class="pct" id="pct">0%</span>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="res-head">
+      <h2>🔥 الريلزات جاهزة للنشر</h2>
+      <span class="b" id="lang-badge"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <footer>
+    <b>ريلز فورج</b> — أداة مفتوحة المصدر تعمل محلياً بالكامل (yt-dlp + Whisper + FFmpeg)<br>
+    التصميم مستوحى من أفضل المشاريع على GitHub: AI-Youtube-Shorts-Generator ⭐4.6k و OpenShorts ⭐3.2k
+  </footer>
+</div>
+
+<div id="toast">تم النسخ ✅</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const STAGE_ORDER = ["download","audio","transcribe","analyze","render","done"];
+const YT_RE = /(youtube\.com\/(watch\?v=|shorts\/|live\/|embed\/)|youtu\.be\/)[\w\-]{6,}/i;
+let pollTimer = null, busy = false, pendingUrl = null, debounceT = null;
+
+function toast(t){
+  const el = $("toast"); el.textContent = t; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2200);
+}
+function fmtDur(s){ s=Math.round(s); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(()=>toast("تم النسخ ✅")).catch(()=>fallbackCopy(t));
+  } else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand("copy"); toast("تم النسخ ✅");}catch(e){toast("تعذّر النسخ");}
+  document.body.removeChild(ta);
+}
+
+function setStage(stage){
+  const idx = STAGE_ORDER.indexOf(stage);
+  document.querySelectorAll(".step").forEach(el=>{
+    const i = STAGE_ORDER.indexOf(el.dataset.s);
+    el.classList.toggle("active", i===idx);
+    el.classList.toggle("done", i<idx);
+  });
+}
+
+async function startJob(url){
+  if(busy) return;
+  url = (url || $("url").value).trim();
+  if(!url || !YT_RE.test(url)){ toast("ألصق رابط يوتيوب صحيحاً 👆"); return; }
+  busy = true;
+  $("go").disabled = true;
+  $("err").style.display="none";
+  $("results").style.display="none";
+  $("progress-box").style.display="block";
+  $("bar").style.width="0%"; $("pct").textContent="0%";
+  $("spin").style.display="inline-block";
+  setStage("download");
+  window.scrollTo({top:$("progress-box").offsetTop-90, behavior:"smooth"});
+
+  try{
+    const r = await fetch("/api/jobs",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({url})});
+    const d = await r.json();
+    if(!r.ok){ showErr(d.error||"خطأ غير معروف"); return; }
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(()=>poll(d.job_id), 1500);
+    poll(d.job_id);
+  }catch(e){ showErr("تعذّر الاتصال بالخادم: "+e); }
+}
+
+async function poll(id){
+  try{
+    const r = await fetch("/api/jobs/"+id); const d = await r.json();
+    if(d.error){ showErr(d.error); clearInterval(pollTimer); finishBusy(); return; }
+    $("bar").style.width = d.progress+"%";
+    $("pct").textContent = d.progress+"%";
+    $("msg").textContent = d.message || "";
+    setStage(d.stage);
+    if(d.state==="done"){
+      clearInterval(pollTimer);
+      d.result._job = id; renderResults(d.result);
+      finishBusy();
+      // جاهز للرابط التالي تلقائياً
+      $("url").value = "";
+      setTimeout(()=>{ $("url").focus(); }, 200);
+      if(pendingUrl){
+        const u = pendingUrl; pendingUrl = null;
+        toast("🔗 نبدأ الرابط الثاني تلقائياً…");
+        $("url").value = u;
+        setTimeout(()=>startJob(u), 900);
+      }
+    }
+    else if(d.state==="error"){ clearInterval(pollTimer); showErr(d.message); finishBusy(); }
+  }catch(e){ /* إعادة المحاولة في الدورة القادمة */ }
+}
+
+function finishBusy(){
+  busy = false; $("go").disabled = false; $("spin").style.display="none";
+}
+function showErr(m){
+  $("err").textContent = "⚠️ " + m; $("err").style.display="block";
+}
+
+function renderResults(res){
+  setStage("done");
+  $("results").style.display="block";
+  $("lang-badge").textContent = res.language==="ar" ? "️ لغة الفيديو: العربية" : "🌐 لغة الفيديو: "+res.language;
+  const grid = $("grid"); grid.innerHTML="";
+  res.clips.forEach((c,i)=>{
+    const card = document.createElement("div"); card.className="card";
+    card.innerHTML = `
+      <div class="vid-wrap">
+        <video controls preload="metadata" playsinline poster="/media/${res._job}/${c.poster}"
+               src="/media/${res._job}/${c.file}"></video>
+        <div class="score">⚡ ${c.score}/100</div>
+        <div class="dur-badge">⏱ ${fmtDur(c.duration)} • ${fmtDur(c.start)}–${fmtDur(c.end)}</div>
+      </div>
+      <div class="card-body">
+        <div class="reason">${c.reason}</div>
+        <div class="title">${c.title}</div>
+        ${c.alternates && c.alternates.length?`<div class="alts">بدائل: ${c.alternates.join(" • ")}</div>`:""}
+        <div class="tags">${c.hashtags.map(h=>`<span class="tag-chip" data-h="${h}">${h}</span>`).join("")}</div>
+        <div class="card-actions">
+          <button class="btn btn-copy" data-i="${i}">📋 نسخ الوصف</button>
+          <a class="btn btn-dl" href="/media/${res._job}/${c.file}" download>⬇️ تحميل الريل</a>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+    card.querySelector('[data-i="'+i+'"]').onclick = ()=>copyText(c.caption);
+    card.querySelectorAll(".tag-chip").forEach(ch=>{
+      ch.onclick = ()=>copyText(ch.dataset.h);
+    });
+  });
+  window.scrollTo({top:$("results").offsetTop-80, behavior:"smooth"});
+}
+
+/* ==== الوضع بدون تدخل: لصق الرابط = انطلاق تلقائي ==== */
+$("url").addEventListener("input", ()=>{
+  clearTimeout(debounceT);
+  const u = $("url").value.trim();
+  if(!YT_RE.test(u)) return;
+  debounceT = setTimeout(()=>{
+    if(busy){
+      pendingUrl = u;
+      toast("⏳ رابطك في قائمة الانتظار — سيشتغل تلقائياً بعد المهمة الحالية");
+    } else {
+      startJob(u);
+    }
+  }, 1200);
+});
+$("go").addEventListener("click", ()=>startJob());
+$("url").addEventListener("keydown", e=>{ if(e.key==="Enter"){ clearTimeout(debounceT); startJob(); } });
+window.addEventListener("load", ()=>$("url").focus());
+</script>
+</body>
+</html>
