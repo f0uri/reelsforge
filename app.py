@@ -142,8 +142,7 @@ def health():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT",
-                              "7860" if os.environ.get("SPACE_ID") else "8000"))
+    port = int(os.environ.get("PORT", 8000))
     try:
         from waitress import serve
         print(f"⚡ خادم إنتاج (waitress) يعمل على 0.0.0.0:{port} — وضع 24/7", flush=True)
